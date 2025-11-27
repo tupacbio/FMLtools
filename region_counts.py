@@ -1,4 +1,4 @@
-#! /usr/bin/env -S pypy3 -OO
+#!/usr/bin/env python3
 
 import click
 import genomerator as gen

@@ -1,4 +1,4 @@
-#! /usr/bin/env -S pypy3 -OO
+#!/usr/bin/env python3
 
 # given a specific sequence (e.g. restriction enzyme's motif), make a BED file of all perfect matches in a reference genome
 # allow target sequence or reference genome to contain ambiguous bases in IUPAC format
