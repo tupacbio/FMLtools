@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/env -S python3.8 -OO
 
 # offset = how many bases in the 3' direction the first base of the read should be from the 5' end of the motif
 # e.g. for LpnPI and FspEI:
@@ -104,34 +104,25 @@ def count_methyl_hits(
     ) as bar:
         last_progress = 0
         for motif_count in motif_counter:
-
-            # ---------------------------------------------------------
-            # MODIFICATION: Adjust Coordinates to Focus on CG only
-            # ---------------------------------------------------------
-            # Note: genomerator uses .left for Start and .right for End
-
-            if motif_count.is_reverse:
-                # Reverse strand (-): Motif is 3'-RNGC-5'.
-                # The 'CG' is at the higher genomic coordinate (the end).
-                # We trim the first 2 bases (RN) by increasing the start (left).
-                motif_count.left += 2
-            else:
-                # Forward strand (+): Motif is 5'-CGNR-3'.
-                # The 'CG' is at the lower genomic coordinate (the start).
-                # We trim the last 2 bases (NR) by setting end (right) to start + 2.
-                motif_count.right = motif_count.left + 2
-
-            # ---------------------------------------------------------
-            # END MODIFICATION
-            # ---------------------------------------------------------
-
             if zeroes or motif_count.data > 0:
-                out_bed.write(
-                    motif_count.bed(
-                        reference_names=sam_file.references, name=motif_count.data
-                    )
-                    + "\n"
+                bed_line = motif_count.bed(
+                    reference_names=sam_file.references, name=motif_count.data
                 )
+                fields = bed_line.strip().split("\t")
+
+                current_start = int(fields[1])
+
+                if motif_count.is_reverse:
+                    # Reverse strand (-): Trim first 2 bases by increasing start by 2
+                    fields[1] = str(current_start + 2)
+
+                else:
+                    # Forward strand (+): Set End to be Start + 2
+                    fields[2] = str(current_start + 2)
+
+                # Write the modified line
+                out_bed.write("\t".join(fields) + "\n")
+
             if not quiet:
                 new_progress = motif_count.progress(sam_file.lengths)
                 bar.update(new_progress - last_progress)
