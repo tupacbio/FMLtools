@@ -1,4 +1,4 @@
-#! /usr/bin/env -S python3.8 -OO
+#!/usr/bin/env python3
 
 # offset = how many bases in the 3' direction the first base of the read should be from the 5' end of the motif
 # e.g. for LpnPI and FspEI:
